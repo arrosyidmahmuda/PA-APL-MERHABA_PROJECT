@@ -1,0 +1,6 @@
+ID|USER|LAPANGAN|JAM_MULAI|DURASI|JAM_SELESAI|STATUS
+1|jawa|1|19:00|1|20:00|done
+2|jawa|1|18:00|1|19:00|done
+3|jawa|1|20:00|1|21:00|done
+4|jawa|1|18:00|3|21:00|done
+5|jawa|1|18:00|2|20:00|pending

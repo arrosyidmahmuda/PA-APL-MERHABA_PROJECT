@@ -1,0 +1,8 @@
+role|name|password
+admin|admin|123
+user|user|123
+user|jawa|123
+user|ada|123
+user|coba|123
+user|coba2|123
+user|coba3|123
