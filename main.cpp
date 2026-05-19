@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
 #include <string>
 #include <limits>
+#include <cstdlib>
 #include "user.h"
 #include "admin.h"
 
@@ -13,7 +13,7 @@ string userLogin;
 
 void clearScreen()
 {
-    system("cls");
+    system("cls || clear");
 }
 
 void pauseScreen()
@@ -41,50 +41,57 @@ void AkunHeader()
 
 bool loginUser()
 {
+    clearScreen();
     AkunHeader();
-    
+
     string username;
     string password;
-    
+
     cout << "\n===== LOGIN =====\n";
-    
+
     cout << "Username : ";
     cin >> username;
-    
+
     cout << "Password : ";
     cin >> password;
-    
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     ifstream file("akun.txt");
-    
+
     string header;
     getline(file, header);
+
     string role;
     string user;
     string pass;
-    
+
     while(getline(file, role, '|'))
     {
         getline(file, user, '|');
         getline(file, pass);
-        
-        if(username == user &&
-            password == pass)
-            {
-                roleLogin = role;
+
+        if(username == user && password == pass)
+        {
+            roleLogin = role;
             userLogin = user;
-            
+
             cout << "\nLogin berhasil!\n";
-            
+
             file.close();
+
+            pauseScreen();
 
             return true;
         }
     }
-    
+
     file.close();
-    
+
     cout << "\nLogin gagal!\n";
-    
+
+    pauseScreen();
+
     return false;
 }
 
@@ -117,6 +124,7 @@ bool cekUsername(string username)
 
 bool registerUser()
 {
+    clearScreen();
     AkunHeader();
 
     string username;
@@ -127,14 +135,19 @@ bool registerUser()
     cout << "Username : ";
     cin >> username;
 
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     if(cekUsername(username))
     {
         cout << "\nUsername sudah terdaftar!\n";
+        pauseScreen();
         return false;
     }
 
     cout << "Password : ";
     cin >> password;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     ofstream file("akun.txt", ios::app);
 
@@ -148,6 +161,7 @@ bool registerUser()
     file.close();
 
     cout << "\nRegister berhasil!\n";
+    pauseScreen();
 
     return loginUser();
 }
@@ -158,6 +172,8 @@ bool menuAuth()
 
     do
     {
+        clearScreen();
+
         cout << "\n===== MENU AUTH =====\n";
 
         cout << "1. Login\n";
@@ -170,25 +186,27 @@ bool menuAuth()
         if(cin.fail())
         {
             cin.clear();
-            cin.ignore(1000, '\n');
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
             cout << "\nInput harus angka!\n";
+
+            pauseScreen();
+
             continue;
         }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch(pilih)
         {
             case 1:
-
                 if(loginUser())
                 {
                     return true;
                 }
-
                 break;
 
             case 2:
-
                 if(registerUser())
                 {
                     return true;
@@ -196,12 +214,11 @@ bool menuAuth()
                 break;
 
             case 3:
-
                 return false;
 
             default:
-
                 cout << "\nPilihan tidak valid!\n";
+                pauseScreen();
         }
 
     } while(true);
@@ -211,17 +228,22 @@ int main()
 {
     AkunHeader();
 
-    while (menuAuth())
+    while(menuAuth())
     {
-        if (roleLogin == "admin")
+        clearScreen();
+
+        if(roleLogin == "admin")
         {
             menuAdmin();
         }
-        else if (roleLogin == "user")
+        else if(roleLogin == "user")
         {
             menuUser();
         }
-        
     }
+
+    clearScreen();
+    cout << "\nProgram selesai.\n";
+
     return 0;
 }
