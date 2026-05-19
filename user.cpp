@@ -3,10 +3,30 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include <limits>
+#include <cstdlib>
+#include <stdexcept>
+#include <cstdio>
 
 using namespace std;
 
 extern string userLogin;
+
+void clearScreenUser()
+{
+    system("cls || clear");
+}
+
+void bersihkanInputUser()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+void pauseScreenUser()
+{
+    cout << "\nTekan ENTER untuk lanjut...";
+    cin.get();
+}
 
 struct Lapangan
 {
@@ -19,6 +39,7 @@ struct Lapangan
 void buatHeaderBooking()
 {
     ifstream cek("booking.txt");
+
     if(!cek.good() || cek.peek() == ifstream::traits_type::eof())
     {
         ofstream file("booking.txt");
@@ -114,12 +135,14 @@ void bubbleSortHarga(Lapangan data[], int jumlah, bool ascending)
     {
         for(int j = 0; j < jumlah - i - 1; j++)
         {
-            bool swapNeeded = (ascending)
-                ? (data[j].harga > data[j + 1].harga)
-                : (data[j].harga < data[j + 1].harga);
+            bool swapNeeded = ascending
+                ? data[j].harga > data[j + 1].harga
+                : data[j].harga < data[j + 1].harga;
 
             if(swapNeeded)
+            {
                 swap(data[j], data[j + 1]);
+            }
         }
     }
 }
@@ -149,6 +172,14 @@ void tampilLapangan()
         }
     }
 
+    file.close();
+
+    if(jumlah == 0)
+    {
+        cout << "\nTidak ada lapangan yang ready!\n";
+        throw runtime_error("Tidak ada lapangan ready");
+    }
+
     string pilihSortInput;
 
     cout << "\nUrutkan harga:\n";
@@ -156,6 +187,7 @@ void tampilLapangan()
     cout << "2. Termahal ke Termurah\n";
     cout << "Pilih : ";
     cin >> pilihSortInput;
+    bersihkanInputUser();
 
     if(pilihSortInput != "1" && pilihSortInput != "2")
     {
@@ -166,9 +198,13 @@ void tampilLapangan()
     int pilihSort = stoi(pilihSortInput);
 
     if(pilihSort == 1)
+    {
         bubbleSortHarga(data, jumlah, true);
+    }
     else if(pilihSort == 2)
+    {
         bubbleSortHarga(data, jumlah, false);
+    }
 
     cout << "\n===== DAFTAR LAPANGAN =====\n";
 
@@ -197,7 +233,6 @@ void bookingLapangan()
     string lapangan;
 
     cout << "\nNama : " << userLogin << endl;
-    cin.ignore();
 
     cout << "Pilih ID Lapangan : ";
     getline(cin, lapangan);
@@ -205,7 +240,7 @@ void bookingLapangan()
     if(cin.fail())
     {
         cin.clear();
-        cin.ignore(1000, '\n');
+        bersihkanInputUser();
 
         cout << "\nInput lapangan tidak valid!\n";
         return;
@@ -270,6 +305,17 @@ void bookingLapangan()
     cout << "\nPilih nomor jam : ";
     cin >> pilihJam;
 
+    if(cin.fail())
+    {
+        cin.clear();
+        bersihkanInputUser();
+
+        cout << "\nInput jam harus angka!\n";
+        return;
+    }
+
+    bersihkanInputUser();
+
     if(pilihJam < 1 || pilihJam > jumlahJam)
     {
         cout << "\nPilihan jam tidak valid!\n";
@@ -282,6 +328,17 @@ void bookingLapangan()
 
     cout << "Mau sewa berapa jam : ";
     cin >> durasi;
+
+    if(cin.fail())
+    {
+        cin.clear();
+        bersihkanInputUser();
+
+        cout << "\nInput durasi harus angka!\n";
+        return;
+    }
+
+    bersihkanInputUser();
 
     if(durasi < 1)
     {
@@ -458,6 +515,7 @@ void ubahJadwal()
 
     cout << "\nMasukkan ID Booking : ";
     cin >> pilihId;
+    bersihkanInputUser();
 
     ifstream file("booking.txt");
 
@@ -494,6 +552,13 @@ void ubahJadwal()
 
     file.close();
 
+    if (!isdigit(pilihId[0]))
+    {
+        cout << "\nID booking tidak valid!\n";
+        return;
+    }
+    
+
     if(!ditemukan)
     {
         cout << "\nID booking tidak ditemukan!\n";
@@ -527,6 +592,17 @@ void ubahJadwal()
     cout << "\nPilih nomor jam : ";
     cin >> pilihJam;
 
+    if(cin.fail())
+    {
+        cin.clear();
+        bersihkanInputUser();
+
+        cout << "\nInput jam harus angka!\n";
+        return;
+    }
+
+    bersihkanInputUser();
+
     if(pilihJam < 1 || pilihJam > jumlahJam)
     {
         cout << "\nPilihan jam tidak valid!\n";
@@ -539,6 +615,17 @@ void ubahJadwal()
 
     cout << "Durasi baru : ";
     cin >> durasiBaru;
+
+    if(cin.fail())
+    {
+        cin.clear();
+        bersihkanInputUser();
+
+        cout << "\nInput durasi harus angka!\n";
+        return;
+    }
+
+    bersihkanInputUser();
 
     if(durasiBaru < 1)
     {
@@ -607,8 +694,8 @@ void ubahJadwal()
     baca.close();
     temp.close();
 
-    remove("booking.txt");
-    rename("temp.txt", "booking.txt");
+    std::remove("booking.txt");
+    std::rename("temp.txt", "booking.txt");
 
     if(berhasil)
     {
@@ -625,6 +712,7 @@ void batalkanBooking()
 
     cout << "\nMasukkan ID Booking : ";
     cin >> pilihId;
+    bersihkanInputUser();
 
     ifstream file("booking.txt");
     ofstream temp("temp.txt");
@@ -663,13 +751,24 @@ void batalkanBooking()
     file.close();
     temp.close();
 
-    remove("booking.txt");
-    rename("temp.txt", "booking.txt");
+    std::remove("booking.txt");
+    std::rename("temp.txt", "booking.txt");
+
+    if (!isdigit(pilihId[0]))
+    {
+        cout << "\nID booking tidak valid!\n";
+        return;
+    }
+    
 
     if(idDitemukan)
+    {
         cout << "\nBooking berhasil dibatalkan!\n";
+    }
     else
+    {
         cout << "\nID booking tidak ditemukan atau bukan milik user ini!\n";
+    }
 }
 
 void menuUser()
@@ -678,6 +777,8 @@ void menuUser()
 
     do
     {
+        clearScreenUser();
+
         cout << "\n===== MENU USER =====\n";
 
         cout << "1. Booking Lapangan\n";
@@ -688,39 +789,54 @@ void menuUser()
 
         cout << "Pilih : ";
         cin >> pilih;
+
         if(cin.fail())
         {
             cin.clear();
-            cin.ignore(1000, '\n');
+            bersihkanInputUser();
 
             cout << "\nInput Hanya Bisa Angka!\n";
+            pauseScreenUser();
+
             continue;
         }
+
+        bersihkanInputUser();
 
         switch(pilih)
         {
             case 1:
+                clearScreenUser();
                 bookingLapangan();
+                pauseScreenUser();
                 break;
 
             case 2:
+                clearScreenUser();
                 ubahJadwal();
+                pauseScreenUser();
                 break;
 
             case 3:
+                clearScreenUser();
                 batalkanBooking();
+                pauseScreenUser();
                 break;
 
             case 4:
+                clearScreenUser();
                 riwayatBooking();
+                pauseScreenUser();
                 break;
 
             case 5:
                 cout << "\nLogout...\n";
+                pauseScreenUser();
                 return;
 
             default:
                 cout << "\nPilihan tidak valid!\n";
+                pauseScreenUser();
         }
 
     } while(true);
